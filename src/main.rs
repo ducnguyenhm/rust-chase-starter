@@ -53,9 +53,19 @@ fn main() {
         direction.normalize();
         player_position = player_position + direction * (speed * delta);
 
-        // Clamp player position to stay within window bounds
-        player_position.x = player_position.x.clamp(size, width as f32 - size);
-        player_position.y = player_position.y.clamp(size, height as f32 - size);
+        // Keep player within window bounds
+        if player_position.x < size {
+            player_position.x = size;
+        }
+        if player_position.x > width as f32 - size {
+            player_position.x = width as f32 - size;
+        }
+        if player_position.y < size {
+            player_position.y = size;
+        }
+        if player_position.y > height as f32 - size {
+            player_position.y = height as f32 - size;
+        }
 
         // check for collision
         if player_position.distance_to(goal_position) < 15.0 {
