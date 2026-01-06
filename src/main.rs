@@ -24,6 +24,8 @@ fn main() {
     let goal_size: f32 = 30.0;
 
     let mut last_time = Instant::now();
+    let success  = 5;
+    let mut score = 0;
 
     while !rl.window_should_close() {
         // update delta time.
@@ -51,15 +53,25 @@ fn main() {
         direction.normalize();
         player_position = player_position + direction * (speed * delta);
 
+        // Clamp player position to stay within window bounds
+        player_position.x = player_position.x.clamp(size, width as f32 - size);
+        player_position.y = player_position.y.clamp(size, height as f32 - size);
+
         // check for collision
         if player_position.distance_to(goal_position) < 15.0 {
-            println!("hit!!")
+            println!("hit!!");
+            score = score + 1;
+            goal_position = random_vector2(width, height);
+            if score == success {
+                break;
+            } 
+
         }
 
         // Peform drawing
         let mut d = rl.begin_drawing(&thread);
         d.clear_background(Color::WHITE);
-        d.draw_text("Hello, world!", 12, height - 20, 20, Color::BLACK);
+        d.draw_text(&format!("Score: {}", score), 12, height - 20, 20, Color::BLACK);
 
         d.draw_circle_v(player_position, size, Color::BLUE);
 
@@ -72,6 +84,15 @@ fn main() {
             goal_size as i32,
             Color::GOLD,
         );
+    }
+
+    // Win screen
+    while !rl.window_should_close() {
+        let mut d = rl.begin_drawing(&thread);
+        d.clear_background(Color::WHITE);
+        d.draw_text("YOU WIN!", width / 2 - 100, height / 2 - 40, 40, Color::BLACK);
+        d.draw_text(&format!("Final Score: {}/{}", score, success), width / 2 - 120, height / 2 + 20, 30, Color::BLACK);
+        d.draw_text("Press ESC to exit", width / 2 - 100, height / 2 + 60, 20, Color::BLACK);
     }
 }
 
